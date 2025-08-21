@@ -30,3 +30,36 @@ ll_check_connection <- function(){
     )
   }
 }
+
+
+#' Check if provided value is a file or a directory and return files.
+#'
+#' @param file_path string, A single pdf file or directory containing pdfs.
+#'
+#' @return file name(s)
+#' @export
+#'
+#' @examples
+ll_check_file_structure <- function(file_path) {
+  # Check first, is file_path a directory?
+  toggle_dir <- dir.exists(file_path)
+
+  if (!toggle_dir & !file.exists(file_path)) {
+    stop(
+      "Please supply a file (e.g., 'paper.pdf') or existing directory (e.g., 'pdf/') for the `file_path` argument."
+    )
+  }
+  if (toggle_dir & length(list.files(file_path)) == 0) {
+    stop("Please check that the directory specified contains pdfs to process.")
+  }
+  if (toggle_dir) {
+    files <- paste0(file_path, list.files(file_path))
+    if (!file.exists(files[1])) {
+      stop("Please format your directory like 'pdf/' with a trailing `/`.")
+    }
+  } else {
+    files <- file_path
+  }
+
+  return(files)
+}

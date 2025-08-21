@@ -51,6 +51,12 @@ ll_query <- function(source,
 
   end <- Sys.time()
   total <- end - start
+  # Sleep a bit to meet rate limitations
+  n <- 6
+  if(total < n){
+    Sys.sleep(n - total)
+    total<- n
+  }
   message(c(source, " duration: ", total))
 
   return(content_out)
@@ -79,7 +85,7 @@ ll_journal_corrections <- function(x) {
 #'
 #' @examples
 ll_clean_authors <- function(x) {
-  if(is.null(x)){
+  if (is.null(x)) {
     stop("Check that each query is going through. Is the rate exceeding the limit?")
   }
 
@@ -95,16 +101,59 @@ ll_clean_authors <- function(x) {
   if ("**" %in% title_chunk) {
     # Sometimes ChatGPT refuses to behave and will bold the Title and break line anyway
     title_chunk <-
-      str_trim(content_split_line[which(str_detect(content_split_line, "(?<=Title:).*")) + 1])
+      stringr::str_trim(content_split_line[which(stringr::str_detect(content_split_line, "(?<=Title:).*")) + 1])
   }
   # Remove any NA lines and give the same title for each author in the item
   title_chunk <- title_chunk[!is.na(title_chunk)]
   title_chunk <- rep(title_chunk, length(authors_chunk))
 
   # Combine everything in a nice DF
-  return(
-    data.frame(title = title_chunk, auth = authors_chunk)
-  )
+  return(data.frame(title = title_chunk, auth = authors_chunk))
+}
+
+
+#' Clean up title, year, and journal from ll_query-type output.
+#'
+#' @param x string, the whole response from ChatGPT
+#'
+#' @return a dataframe.
+#'
+#' @examples
+ll_clean_journals <- function(x) {
+  if (is.null(x)) {
+    stop("Check that each query is going / went through. Is the rate exceeding the limit?")
+  }
+
+  # Break up unstructured response
+  content_split_line <- stringr::str_split(x, "\n")[[1]]
+
+  # Pull out title chunks and more based on "Title" headings
+  title_chunk <-
+    stringr::str_trim(stringr::str_match(content_split_line, "(?<=Title:).*"))
+  year_chunk <-
+    stringr::str_trim(stringr::str_match(content_split_line, "(?<=Year:).*"))
+  journal_chunk <-
+    stringr::str_trim(stringr::str_match(content_split_line, "(?<=Journal:).*"))
+  if ("**" %in% title_chunk) {
+    # Sometimes ChatGPT refuses to behave and will bold the Title and break line anyway
+    title_chunk <-
+      stringr::str_trim(content_split_line[which(stringr::str_detect(content_split_line, "(?<=Title:).*")) + 1])
+  }
+  if ("**" %in% year_chunk) {
+    journal_chunk <-
+      stringr::str_trim(content_split_line[which(stringr::str_detect(content_split_line, "(?<=Year:).*")) + 1])
+  }
+  if ("**" %in% journal_chunk) {
+    journal_chunk <-
+      stringr::str_trim(content_split_line[which(stringr::str_detect(content_split_line, "(?<=Journal:).*")) + 1])
+  }
+  # Remove any NA lines and give the same title for each author in the item
+  title_chunk <- title_chunk[!is.na(title_chunk)]
+  year_chunk <- year_chunk[!is.na(year_chunk)]
+  journal_chunk <- journal_chunk[!is.na(journal_chunk)]
+
+  # Combine everything in a nice DF
+  return(data.frame(title = title_chunk, year = year_chunk, journal = journal_chunk))
 }
 
 
@@ -125,30 +174,12 @@ ll_extract_authors <- function(file_path,
                                clean_authors = TRUE) {
   # I looked into parallelizing this, but ran into rate limitation. So probably just best to let this run and be patient :)
 
-  # Check first, is file_path a directory?
-  toggle_dir <- dir.exists(file_path)
-
-  if (!toggle_dir & !file.exists(file_path)) {
-    stop(
-      "Please supply a file (e.g., 'paper.pdf') or existing directory (e.g., 'pdf/') for the `file_path` argument."
-    )
-  }
-  if (toggle_dir & length(list.files(file_path)) == 0) {
-    stop("Please check that the directory specified contains pdfs to process.")
-  }
-  if (toggle_dir) {
-    files <- paste0(file_path, list.files(file_path))
-    if (!file.exists(files[1])) {
-      stop("Please format your directory like 'pdf/' with a trailing `/`.")
-    }
-  } else {
-    files <- file_path
-  }
-
+  files <- ll_check_file_structure(file_path)
   ll_check_connection()
+  cache_file <- "author_list.rds"
 
   # Write file to save time and $$
-  if (!file.exists("author_list.rds")) {
+  if (!file.exists(cache_file)) {
     author_list <-
       mapply(
         ll_query,
@@ -158,22 +189,27 @@ ll_extract_authors <- function(file_path,
         api_key = api_key,
         prompt = "Can you extract the article title and author information (names and institutions)? Please print 'Title:' followed by the title. Then, print 'Author(s):' followed by each author, institution combination as a separate line. Take any text that is all caps and use appropriate capitalization. Do not bold 'Title:' or 'Author(s):'."
       )
-    save(author_list, file = "author_list.rds")
-    message("File written to: ", here::here(), "/author_list.rds")
+    save(author_list, file = cache_file)
+    message("File written to: ", here::here(), "/", cache_file)
   } else {
     message(
       "Using cached version of author_list previously generated at: ",
       here::here(),
-      "/author_list.rds"
+      "/",
+      cache_file
     )
-    load("author_list.rds")[[1]]
-    if(author_list == "author_list"){
-      stop("There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_authors` again.")
+    author_list <- readRDS(cache_file)
+    if (length(author_list) == 1) {
+      if (author_list == "author_list") {
+        stop(
+          "There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_authors` again."
+        )
+      }
     }
   }
 
   # Optional cleaning of output
-  if(clean_authors){
+  if (clean_authors) {
     authors_output <-
       dplyr::bind_rows(lapply(author_list, ll_clean_authors), .id = "paper_id")
   } else {
@@ -181,6 +217,65 @@ ll_extract_authors <- function(file_path,
   }
 
   return(authors_output)
+}
+
+
+#' Mine ChatGPT for pdf metadata: Title, Year, and Journal.
+#'
+#' @param file_path string, A single pdf file or directory containing pdfs.
+#' @param model string, which OpenAI ChatGPT model to use.
+#' @param api_key string, the API key if you want to supply it manually. There is no free one, but used with a minimal model is very cheap. https://openai.com/api/pricing/.
+#' @param clean_journals logical, whether to output a cleaned dataframe of journals. If FALSE, returns raw ChatGPT output. This can be useful in case ChatGPT goes off script and hallucinates.
+#'
+#' @return a dataframe.
+#' @export
+#'
+#' @examples
+ll_extract_journals <- function(file_path,
+                               model = "gpt-4o-mini",
+                               api_key = Sys.getenv("OPENAI_API_KEY"),
+                               clean_journals = TRUE) {
+  files <- ll_check_file_structure(file_path)
+  ll_check_connection()
+  cache_file <- "journal_list.rds"
+
+  # Write file to save time and $$
+  if (!file.exists(cache_file)) {
+    journal_list <-
+      mapply(
+        ll_query,
+        files,
+        SIMPLIFY = FALSE,
+        model = model,
+        api_key = api_key,
+        prompt = "Can you extract the article title, year, and journal name? Please print 'Title:' followed by the title. Then, print 'Year:' followed by the year. Then, print 'Journal:' followed by the journal name. Take any text that is all caps and use appropriate capitalization. Do not bold 'Title:' or 'Year:' or 'Journal'."
+      )
+    save(journal_list, file = cache_file)
+    message("File written to: ", here::here(), "/", cache_file)
+  } else {
+    message(
+      "Using cached version of journal_list previously generated at: ",
+      here::here(),
+      "/",
+      cache_file
+    )
+    load(cache_file)[[1]]
+    if (journal_list[1] == "journal_list") {
+      stop(
+        "There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_journal` again."
+      )
+    }
+  }
+
+  # Optional cleaning of output
+  if (clean_journals) {
+    journal_output <-
+      dplyr::bind_rows(lapply(journal_list, ll_clean_journals))
+  } else {
+    journal_output <- journal_list
+  }
+
+  return(journal_output)
 }
 
 
@@ -229,11 +324,11 @@ ll_pull_institutions <- function(text,
 #' @return A data frame containing T/F data for each item in `text`.
 #' @export
 #'
-#' @examples ll_check_institution_type("Johns Hopkins University", logical_check = "an institution with >5000 students")
-ll_check_institution_type <- function(text,
-                                      model = "gpt-4o-mini",
-                                      api_key = Sys.getenv("OPENAI_API_KEY"),
-                                      logical_check = "in the United States") {
+#' @examples ll_find_institution_type("Johns Hopkins University", logical_check = "an institution with >5000 students")
+ll_find_institution_type <- function(text,
+                                     model = "gpt-4o-mini",
+                                     api_key = Sys.getenv("OPENAI_API_KEY"),
+                                     logical_check = "in the United States") {
   ll_check_connection()
 
   if (!is.character(text)) {
