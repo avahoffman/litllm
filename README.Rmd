@@ -16,9 +16,10 @@ knitr::opts_chunk$set(
 # litllm
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-The goal of litllm is to ...
+The goal of `litllm` is to help you mine pdfs for scholarly analysis.
 
 ## Installation
 
@@ -29,27 +30,19 @@ You can install the development version of litllm from [GitHub](https://github.c
 devtools::install_github("avahoffman/litllm")
 ```
 
-## Example
+## Getting started
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example, eval=F}
+```{r eval=F}
 library(litllm)
-## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
+```{r echo=F, message=F}
+devtools::load_all()
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+`litllm` uses the OpenAI API. You'll need an API key to use it. Check that you have an API key saved in your environment:
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r}
+ll_check_api_key()
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
