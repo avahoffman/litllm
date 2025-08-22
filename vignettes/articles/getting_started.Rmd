@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Load the package:
+Load `litllm` and `tidyverse` (for some wrangling):
 
 ```{r setup}
 library(litllm)
@@ -70,6 +70,8 @@ glimpse(journal_metadata)
 
 ➡ _This function supports caching, which hopefully saves you time and query costs! You can delete or relocate the cached file to rerun from scratch._
 
+### LLMs Aren't perfect!
+
 ⚠️ _We recommend **checking your data regularly** for anything that doesn't make sense. LLMs like ChatGPT can save time, but they definitely make mistakes. You don't want to end up with a journal entitled "Johns Hopkins University"!_
 
 ## Mining Authors and Institutions
@@ -112,6 +114,8 @@ head(authors)
 #> 6                  Eimear E. Kenny, Institute for Genomic Health, Icahn School of Medicine at Mount Sinai, New York, NY, USA
 ```
 
+### Getting Raw Author Data
+
 You can view the data in raw format as well.
 
 ```{r}
@@ -144,6 +148,8 @@ distinct_institutions <- unique(authors$inst)
 #> [5] "Institut de Recherche en Santé Digestive, Université de Toulouse, INSERM, INRA, ENVT, UPS"
 ```
 
+### Logical Queries for Institutions 
+
 Let's see if these institutions have a large student body. Any institutional discriptor can be inserted for the `logical_check` argument.
 
 ```{r}
@@ -166,6 +172,8 @@ is_large
 #> 5 Institut de Recherche en Santé Digestive, Un… FALSE
 #> # ℹ abbreviated name: ¹​an_institution_with_5000_students
 ```
+
+### Combining `litllm` Data
 
 Join to `authors` to build your dataset!
 
