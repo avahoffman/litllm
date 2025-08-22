@@ -73,7 +73,7 @@ wrangling):</p>
 </h2>
 <p><code>litllm</code> uses the OpenAI API. You’ll need an API key and
 internet connection to use it.</p>
-<p><em>⚠️ The OpenAI API costs money. It is very cheap (around $0.60 for
+<p>⚠️ <em>The OpenAI API costs money. It is very cheap (around $0.60 for
 analyzing 100 pdfs), but you’ll need to add credits through their
 interface.</em></p>
 <p>Check that you have an API key saved in your environment:</p>
@@ -95,7 +95,8 @@ start with one file, then we’ll show you how to do multiple files.</p>
 <div class="section level2">
 <h2 id="mining-publication-metadata">Mining Publication Metadata<a class="anchor" aria-label="anchor" href="#mining-publication-metadata"></a>
 </h2>
-<p>Let’s get basic information: title, year, and journal name.</p>
+<p>Let’s get basic information: title, year, and journal name. Each file
+will be a separate row.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">journal_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ll_extract_journals.html">ll_extract_journals</a></span><span class="op">(</span><span class="st">"Taylor_etal.pdf"</span><span class="op">)</span></span>
 <span><span class="fu">glimpse</span><span class="op">(</span><span class="va">journal_metadata</span><span class="op">)</span></span></code></pre></div>
@@ -120,11 +121,8 @@ entitled “Johns Hopkins University”!</em></p>
 <div class="section level2">
 <h2 id="mining-authors-and-institutions">Mining Authors and Institutions<a class="anchor" aria-label="anchor" href="#mining-authors-and-institutions"></a>
 </h2>
-<p>Let’s obtain the authors and their institutions.</p>
-<p><code><a href="../reference/ll_extract_authors.html">ll_extract_authors()</a></code> produces a tibble with a column
-“paper_id” (the file name), “title” (the article title), and “auth”
-(individual author information). Each author will be on a separate
-row.</p>
+<p>Let’s obtain the authors and their institutions. Each author will be
+on a separate row.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">authors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ll_extract_authors.html">ll_extract_authors</a></span><span class="op">(</span><span class="st">"Taylor_etal.pdf"</span><span class="op">)</span></span>
 <span><span class="fu">glimpse</span><span class="op">(</span><span class="va">authors</span><span class="op">)</span></span></code></pre></div>
