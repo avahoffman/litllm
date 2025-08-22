@@ -19,7 +19,11 @@ library(tidyverse)
 
 ## Setup
 
-`litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. Check that you have an API key saved in your environment:
+`litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. 
+
+_⚠️ The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
+
+Check that you have an API key saved in your environment:
 
 ```{r}
 ll_check_api_key()
@@ -30,11 +34,9 @@ ll_check_api_key()
 #> If you are having issues later, the key could be entered incorrectly or may no longer be active on OpenAI's API interface.
 ```
 
-_Note: The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
+The first thing you'll want to do is locate your pdf file(s). Let's start with one file, then we'll show you how to do multiple files.
 
-The first thing you'll want to do is locate your pdf file(s). Let's start with one, then we'll show you how to do multiple.
-
-Download this file and ensure it's in your working directory.
+Download this file and ensure it's in your working directory:
 
 ```{r}
 download.file(
@@ -47,6 +49,28 @@ list.files(pattern = "pdf")
 ```
 #> [1]"Taylor_etal.pdf"
 ```
+
+## Mining Publication Metadata
+
+Let's get basic information: title, year, and journal name.
+
+```{r}
+journal_metadata <- ll_extract_journals("Taylor_etal.pdf")
+glimpse(journal_metadata)
+```
+
+```
+#> Rows: 1
+#> Columns: 4
+#> $ paper_id <chr> "Taylor_etal.pdf"
+#> $ title    <chr> "Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References"
+#> $ year     <chr> "2024"
+#> $ journal  <chr> "Annual Review of Genomics and Human Genetics"
+```
+
+➡ _This function supports caching, which hopefully saves you time and query costs! You can delete or relocate the cached file to rerun from scratch._
+
+⚠️ _We recommend **checking your data regularly** for anything that doesn't make sense. LLMs like ChatGPT can save time, but they definitely make mistakes. You don't want to end up with a journal entitled "Johns Hopkins University"!_
 
 ## Mining Authors and Institutions
 
@@ -102,11 +126,7 @@ authors_raw
 #> California, Santa Cruz...
 ```
 
-::: {.callout-tip}
-## LLMs arent perfect
-
-We recommend **checking your data regularly** for anything that doesn't make sense. LLMs like ChatGPT can save time, but they definitely make mistakes. You don't want to end up with an author named "Johns Hopkins University"!
-:::
+➡ _This function supports caching, which hopefully saves you time and query costs! You can delete or relocate the cached file to rerun from scratch._
 
 ## Getting Institution Information
 
