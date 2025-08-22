@@ -21,7 +21,7 @@ library(tidyverse)
 
 `litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. 
 
-_⚠️ The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
+⚠️ _The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
 
 Check that you have an API key saved in your environment:
 
@@ -52,7 +52,7 @@ list.files(pattern = "pdf")
 
 ## Mining Publication Metadata
 
-Let's get basic information: title, year, and journal name.
+Let's get basic information: title, year, and journal name. Each file will be a separate row.
 
 ```{r}
 journal_metadata <- ll_extract_journals("Taylor_etal.pdf")
@@ -76,9 +76,7 @@ glimpse(journal_metadata)
 
 ## Mining Authors and Institutions
 
-Let's obtain the authors and their institutions.
-
-`ll_extract_authors()` produces a tibble with a column "paper_id" (the file name), "title" (the article title), and "auth" (individual author information). Each author will be on a separate row.
+Let's obtain the authors and their institutions. Each author will be on a separate row.
 
 ```{r}
 authors <- ll_extract_authors("Taylor_etal.pdf")
