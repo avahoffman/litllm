@@ -19,6 +19,8 @@ library(tidyverse)
 
 ## Setup
 
+### OpenAI API
+
 `litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. 
 
 ⚠️ _The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
@@ -33,6 +35,14 @@ ll_check_api_key()
 #> Looks like you have a key stored!🎉
 #> If you are having issues later, the key could be entered incorrectly or may no longer be active on OpenAI's API interface.
 ```
+
+If no API key detected, you'll need to generate one via [OpenAI's interface](https://openai.com/api) and add it to your R Environment. You can do this by entering `usethis::edit_r_environ()` and adding `OPENAI_API_KEY=XXX` (replace `XXX` with your key) to a new line.
+
+```{r}
+usethis::edit_r_environ()
+```
+
+### Download Example File
 
 The first thing you'll want to do is locate your pdf file(s). Let's start with one file, then we'll show you how to do multiple files.
 
@@ -187,4 +197,57 @@ authors <- authors %>% left_join(is_large, by = c("inst" = "name"))
 #> $ auth                              <chr> "Dylan J. Taylor, Department of Bi…
 #> $ inst                              <chr> "Johns Hopkins University", "Unive…
 #> $ an_institution_with_5000_students <chr> "TRUE", "TRUE", "TRUE", "TRUE", "F…
+```
+
+## Multiple PDF Files
+
+The real power of automation can be felt when you have a lot of files. You can use these functions on a directory instead of a pdf file.
+
+```{r}
+multi_journal_metadata <- ll_extract_journals("pdf/")
+```
+
+```
+#> Querying: pdf/Hung_etal.pdf
+#> pdf/Hung_etal.pdf --- duration: 6
+#> Querying: pdf/Taylor_etal.pdf
+#> pdf/Taylor_etal.pdf --- duration: 6
+#> File written to: /Users/me/litllm/journal_list.rds
+```
+
+```{r}
+glimpse(multi_journal_metadata)
+```
+
+```
+#> Rows: 2
+#> Columns: 4
+#> $ paper_id <chr> "pdf/Hung_etal.pdf", "pdf/Taylor_etal.pdf"
+#> $ title    <chr> "Harmonizing and integrating the NCI Genomic Data Commons through accessible, interactive, and cloud-enabled workflows", "Beyond the Human …
+#> $ year     <chr> "2025", "2024"
+#> $ journal  <chr> "PLoS ONE", "Annual Review of Genomics and Human Genetics"
+```
+
+```{r}
+multi_authors <- ll_extract_authors("pdf/")
+```
+
+```
+#> Querying: pdf/Hung_etal.pdf
+#> pdf/Hung_etal.pdf --- duration: 6.05043506622314
+#> Querying: pdf/Taylor_etal.pdf
+#> pdf/Taylor_etal.pdf --- duration: 7.92582488059998
+#> File written to: /Users/me/litllm/author_list.rds
+```
+
+```{r}
+glimpse(multi_authors)
+```
+
+```
+#> Rows: 17
+#> Columns: 3
+#> $ paper_id <chr> "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf…
+#> $ title    <chr> "Harmonizing and integrating the NCI Genomic Data Commons through accessible, interactiv…
+#> $ auth     <chr> "Ling-Hong Hung, School of Engineering and Technology, University of Washington Tacoma, …
 ```
