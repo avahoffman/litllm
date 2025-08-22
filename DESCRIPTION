@@ -23,6 +23,5 @@ Imports:
     pdftools,
     stringr,
     tibble,
-    rlib/pkgdown,
     quarto
 URL: http://www.avahoffman.com/litllm/
