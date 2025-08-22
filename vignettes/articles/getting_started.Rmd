@@ -17,9 +17,7 @@ library(litllm)
 library(tidyverse)
 ```
 
-## Setup
-
-### OpenAI API
+## OpenAI API
 
 `litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. 
 
@@ -42,7 +40,7 @@ If no API key detected, you'll need to generate one via [OpenAI's interface](htt
 usethis::edit_r_environ()
 ```
 
-### Download Example File
+## Download Example File
 
 The first thing you'll want to do is locate your pdf file(s). Let's start with one file, then we'll show you how to do multiple files.
 
@@ -79,8 +77,6 @@ glimpse(journal_metadata)
 ```
 
 ➡ _This function supports caching, which hopefully saves you time and query costs! You can delete or relocate the cached file to rerun from scratch._
-
-### LLMs Aren't perfect!
 
 ⚠️ _We recommend **checking your data regularly** for anything that doesn't make sense. LLMs like ChatGPT can save time, but they definitely make mistakes. You don't want to end up with a journal entitled "Johns Hopkins University"!_
 
@@ -122,8 +118,6 @@ head(authors)
 #> 6                  Eimear E. Kenny, Institute for Genomic Health, Icahn School of Medicine at Mount Sinai, New York, NY, USA
 ```
 
-### Getting Raw Author Data
-
 You can view the data in raw format as well.
 
 ```{r}
@@ -156,9 +150,7 @@ distinct_institutions <- unique(authors$inst)
 #> [5] "Institut de Recherche en Santé Digestive, Université de Toulouse, INSERM, INRA, ENVT, UPS"
 ```
 
-### Logical Queries for Institutions 
-
-Let's see if these institutions have a large student body. Any institutional discriptor can be inserted for the `logical_check` argument.
+Let's see if these institutions have a large student body. Any institutional descriptor can be inserted for the `logical_check` argument.
 
 ```{r}
 is_large <-
@@ -180,8 +172,6 @@ is_large
 #> 5 Institut de Recherche en Santé Digestive, Un… FALSE
 #> # ℹ abbreviated name: ¹​an_institution_with_5000_students
 ```
-
-### Combining `litllm` Data
 
 Join to `authors` to build your dataset!
 
