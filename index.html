@@ -35,7 +35,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/getting_started.html">getting_started</a></li>
+<li><a class="dropdown-item" href="articles/getting_started.html">Getting Started</a></li>
   </ul>
 </li>
       </ul>
@@ -65,27 +65,11 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"avahoffman/litllm"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.avahoffman.com/litllm/">litllm</a></span><span class="op">)</span></span></code></pre></div>
-<p><code>litllm</code> uses the OpenAI API. You’ll need an API key and internet connection to use it. Check that you have an API key saved in your environment:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/ll_check_api_key.html">ll_check_api_key</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Looks like you have a key stored!🎉</span></span>
-<span><span class="co">#&gt; If you are having issues later, the key could be entered incorrectly or may no longer be active on OpenAI's API interface.</span></span></code></pre></div>
-<p><em>Note: The OpenAI API costs money. It is very cheap (around $0.80 for analyzing 100 pdfs), but you’ll need to add credits through their interface.</em></p>
-<p>Create a subdirectory in your working directory. We typically call ours “pdf/”. Add the pdf files for any publications you’d like to analyze to this directory.</p>
-<p><em>Note: We recommend starting with ~2 files so you can make sure everything is working as expected.</em></p>
-</div>
-<div class="section level2">
-<h2 id="getting-authors-and-titles">Getting authors and titles<a class="anchor" aria-label="anchor" href="#getting-authors-and-titles"></a>
-</h2>
-<p>The first thing you might want to do is iterate through all your pdf files, finding the article’s title and author information:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># look at files in the "pdf/" directory</span></span>
-<span><span class="va">author_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ll_extract_authors.html">ll_extract_authors</a></span><span class="op">(</span><span class="st">"pdf/"</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/ll_extract_authors.html">ll_extract_authors()</a></code> produces a tibble with a column “paper_id” (the file name), “title” (the article title), and “auth” (individual author information). Each author will be on a separate row.</p>
+<p>Please follow along with the vignette to learn how to use this package:</p>
+<p><a href="https://www.avahoffman.com/litllm/articles/getting_started.html" class="external-link uri">https://www.avahoffman.com/litllm/articles/getting_started.html</a></p>
+<p>Please let us know about any bugs or suggestions via <a href="https://github.com/avahoffman/litllm/issues" class="external-link">GitHub issues</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
