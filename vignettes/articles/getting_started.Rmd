@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 
 Load the package:
 
-```{r setup}
+```{r setup, eval=F}
 library(litllm)
 library(tidyverse)
 ```
@@ -47,7 +47,7 @@ list.files(pattern = "pdf")
 #> [1]"Taylor_etal.pdf"
 ```
 
-### Mining Authors and Institutions
+## Mining Authors and Institutions
 
 Let's obtain the authors and their institutions.
 
@@ -85,4 +85,18 @@ head(authors)
 #> 4                               Arun Das, Department of Computer Science, Johns Hopkins University, Baltimore, Maryland, USA
 #> 5 Katharine M. Jenike, Department of Genetic Medicine, Johns Hopkins University School of Medicine, Baltimore, Maryland, USA
 #> 6                  Eimear E. Kenny, Institute for Genomic Health, Icahn School of Medicine at Mount Sinai, New York, NY, USA
+```
+
+You can view the data in raw format as well.
+
+```{r eval=F}
+authors_raw <- ll_extract_authors("Taylor_etal.pdf", clean_authors = F)
+authors_raw
+```
+
+```
+#> $Taylor_etal.pdf
+#> [1] "Title: Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References\n\nAuthor(s):\nDylan J. 
+#> Taylor, Department of Biology, Johns Hopkins University, Baltimore, Maryland, USA\nJordan M. Eizenga, Genomics Institute, University of 
+#> California, Santa Cruz...
 ```
