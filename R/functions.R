@@ -270,7 +270,7 @@ ll_extract_journals <- function(file_path,
   # Optional cleaning of output
   if (clean_journals) {
     journal_output <-
-      dplyr::bind_rows(lapply(journal_list, ll_clean_journals))
+      dplyr::bind_rows(lapply(journal_list, ll_clean_journals), .id = "paper_id")
   } else {
     journal_output <- journal_list
   }
