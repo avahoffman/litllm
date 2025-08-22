@@ -22,6 +22,6 @@ Imports:
     janitor,
     pdftools,
     stringr,
-    tibble,
-    quarto
+    tibble
 URL: http://www.avahoffman.com/litllm/
+Config/Needs/website: rmarkdown

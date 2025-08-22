@@ -1,0 +1,14 @@
+---
+title: "getting_started"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(litllm)
+```
