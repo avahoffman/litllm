@@ -5,13 +5,14 @@ title: "Getting Started"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  eval = FALSE,
   comment = "#>"
 )
 ```
 
 Load the package:
 
-```{r setup, eval=F}
+```{r setup}
 library(litllm)
 library(tidyverse)
 ```
@@ -20,7 +21,7 @@ library(tidyverse)
 
 `litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. Check that you have an API key saved in your environment:
 
-```{r eval=F}
+```{r}
 ll_check_api_key()
 ```
 
@@ -29,7 +30,7 @@ ll_check_api_key()
 #> If you are having issues later, the key could be entered incorrectly or may no longer be active on OpenAI's API interface.
 ```
 
-_Note: The OpenAI API costs money. It is very cheap (around $0.80 for analyzing 100 pdfs), but you'll need to add credits through their interface._
+_Note: The OpenAI API costs money. It is very cheap (around $0.60 for analyzing 100 pdfs), but you'll need to add credits through their interface._
 
 The first thing you'll want to do is locate your pdf file(s). Let's start with one, then we'll show you how to do multiple.
 
@@ -53,7 +54,7 @@ Let's obtain the authors and their institutions.
 
 `ll_extract_authors()` produces a tibble with a column "paper_id" (the file name), "title" (the article title), and "auth" (individual author information). Each author will be on a separate row.
 
-```{r eval=F}
+```{r}
 authors <- ll_extract_authors("Taylor_etal.pdf")
 glimpse(authors)
 ```
@@ -66,7 +67,7 @@ glimpse(authors)
 #> $ auth     <chr> "Dylan J. Taylor, Department of Biology, Johns Hopkins Unive…
 ```
 
-```{r eval=F}
+```{r}
 head(authors)
 ```
 
@@ -89,7 +90,7 @@ head(authors)
 
 You can view the data in raw format as well.
 
-```{r eval=F}
+```{r}
 authors_raw <- ll_extract_authors("Taylor_etal.pdf", clean_authors = F)
 authors_raw
 ```
@@ -99,4 +100,65 @@ authors_raw
 #> [1] "Title: Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References\n\nAuthor(s):\nDylan J. 
 #> Taylor, Department of Biology, Johns Hopkins University, Baltimore, Maryland, USA\nJordan M. Eizenga, Genomics Institute, University of 
 #> California, Santa Cruz...
+```
+
+::: {.callout-tip}
+## LLMs arent perfect
+
+We recommend **checking your data regularly** for anything that doesn't make sense. LLMs like ChatGPT can save time, but they definitely make mistakes. You don't want to end up with an author named "Johns Hopkins University"!
+:::
+
+## Getting Institution Information
+
+We might be interested in information about the institutions. But first let's limit it to unique institutions.
+
+```{r}
+distinct_institutions <- unique(authors$inst)
+```
+
+```
+#> [1] "Johns Hopkins University"
+#> [2] "University of California, Santa Cruz"
+#> [3] "Johns Hopkins University School of Medicine"
+#> [4] "Icahn School of Medicine at Mount Sinai"
+#> [5] "Institut de Recherche en Santé Digestive, Université de Toulouse, INSERM, INRA, ENVT, UPS"
+```
+
+Let's see if these institutions have a large student body. Any institutional discriptor can be inserted for the `logical_check` argument.
+
+```{r}
+is_large <-
+  ll_check_institution_type(
+    distinct_institutions,
+    logical_check = "an institution with >5000 students"
+    )
+is_large
+```
+
+```
+#> # A tibble: 5 × 2
+#>   name                                          an_institution_with_…¹
+#>   <chr>                                         <chr>
+#> 1 Johns Hopkins University                      TRUE
+#> 2 University of California, Santa Cruz          TRUE
+#> 3 Johns Hopkins University School of Medicine   FALSE
+#> 4 Icahn School of Medicine at Mount Sinai       FALSE
+#> 5 Institut de Recherche en Santé Digestive, Un… FALSE
+#> # ℹ abbreviated name: ¹​an_institution_with_5000_students
+```
+
+Join to `authors` to build your dataset!
+
+```{r}
+authors <- authors %>% left_join(is_large, by = c("inst" = "name"))
+```
+
+```
+#> Rows: 11
+#> Columns: 5
+#> $ paper_id                          <chr> "Taylor_etal.pdf", "Taylor_etal.pd…
+#> $ title                             <chr> "Beyond the Human Genome Project: …
+#> $ auth                              <chr> "Dylan J. Taylor, Department of Bi…
+#> $ inst                              <chr> "Johns Hopkins University", "Unive…
+#> $ an_institution_with_5000_students <chr> "TRUE", "TRUE", "TRUE", "TRUE", "F…
 ```
