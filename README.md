@@ -45,7 +45,7 @@ this directory.
 *Note: We recommend starting with ~2 files so you can make sure
 everything is working as expected.*
 
-## Getting information
+## Getting authors and titles
 
 The first thing you might want to do is iterate through all your pdf
 files, finding the article’s title and author information:
