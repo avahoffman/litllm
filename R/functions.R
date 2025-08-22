@@ -189,7 +189,7 @@ ll_extract_authors <- function(file_path,
         api_key = api_key,
         prompt = "Can you extract the article title and author information (names and institutions)? Please print 'Title:' followed by the title. Then, print 'Author(s):' followed by each author, institution combination as a separate line. Take any text that is all caps and use appropriate capitalization. Do not bold 'Title:' or 'Author(s):'."
       )
-    save(author_list, file = cache_file)
+    saveRDS(author_list, file = cache_file)
     message("File written to: ", here::here(), "/", cache_file)
   } else {
     message(
@@ -250,7 +250,7 @@ ll_extract_journals <- function(file_path,
         api_key = api_key,
         prompt = "Can you extract the article title, year, and journal name? Please print 'Title:' followed by the title. Then, print 'Year:' followed by the year. Then, print 'Journal:' followed by the journal name. Take any text that is all caps and use appropriate capitalization. Do not bold 'Title:' or 'Year:' or 'Journal'."
       )
-    save(journal_list, file = cache_file)
+    saveRDS(journal_list, file = cache_file)
     message("File written to: ", here::here(), "/", cache_file)
   } else {
     message(
