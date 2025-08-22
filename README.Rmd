@@ -30,35 +30,10 @@ You can install the development version of litllm from [GitHub](https://github.c
 devtools::install_github("avahoffman/litllm")
 ```
 
-## Getting started
+## Getting Started
 
-```{r eval=F}
-library(litllm)
-```
+Please follow along with the vignette to learn how to use this package:
 
-```{r echo=F, message=F}
-devtools::load_all()
-```
+https://www.avahoffman.com/litllm/articles/getting_started.html
 
-`litllm` uses the OpenAI API. You'll need an API key and internet connection to use it. Check that you have an API key saved in your environment:
-
-```{r}
-ll_check_api_key()
-```
-
-_Note: The OpenAI API costs money. It is very cheap (around $0.80 for analyzing 100 pdfs), but you'll need to add credits through their interface._
-
-Create a subdirectory in your working directory. We typically call ours "pdf/". Add the pdf files for any publications you'd like to analyze to this directory. 
-
-_Note: We recommend starting with ~2 files so you can make sure everything is working as expected._
-
-## Getting authors and titles
-
-The first thing you might want to do is iterate through all your pdf files, finding the article's title and author information:
-
-```{r eval=F}
-# look at files in the "pdf/" directory
-author_df <- ll_extract_authors("pdf/")
-```
-
-`ll_extract_authors()` produces a tibble with a column "paper_id" (the file name), "title" (the article title), and "auth" (individual author information). Each author will be on a separate row.
+Please let us know about any bugs or suggestions via [GitHub issues](https://github.com/avahoffman/litllm/issues).
