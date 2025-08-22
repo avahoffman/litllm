@@ -57,7 +57,7 @@ ll_query <- function(source,
     Sys.sleep(n - total)
     total<- n
   }
-  message(c(source, " duration: ", total))
+  message(c(source, " --- duration: ", total))
 
   return(content_out)
 }
@@ -259,7 +259,7 @@ ll_extract_journals <- function(file_path,
       "/",
       cache_file
     )
-    load(cache_file)[[1]]
+    journal_list <- readRDS(cache_file)
     if (journal_list[1] == "journal_list") {
       stop(
         "There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_journal` again."
