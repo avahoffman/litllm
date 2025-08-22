@@ -22,5 +22,7 @@ Imports:
     janitor,
     pdftools,
     stringr,
-    tibble
+    tibble,
+    rlib/pkgdown,
+    quarto
 URL: http://www.avahoffman.com/litllm/
