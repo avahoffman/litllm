@@ -12,19 +12,54 @@ ll_query(
 )
 }
 \arguments{
-\item{source}{string, either a file or string of text that data will be mined
-from. "pdf/journal_article.pdf" or "Here is a very long string of text I
-would like to query directly"}
+\item{source}{string, either a file path to a PDF or a string of text that
+data will be mined from. Examples: "pdf/journal_article.pdf" or
+"Here is a very long string of text I would like to query directly"}
 
 \item{prompt}{string, a prompt for ChatGPT.}
 
-\item{model}{string, which OpenAI ChatGPT model to use.}
+\item{model}{string, which OpenAI ChatGPT model to use. Default is
+"gpt-4o-mini". See: \url{https://platform.openai.com/docs/models}}
 
-\item{api_key}{string, the API key if you want to supply it manually. There is no free one, but used with a minimal model is very cheap. https://openai.com/api/pricing/.}
+\item{api_key}{string, the OpenAI API key. Defaults to the OPENAI_API_KEY
+environment variable. There is no free tier, but minimal model usage is
+very affordable. See: \url{https://openai.com/api/pricing/}}
 }
 \value{
-Raw content from API
+string, the raw text response content from the OpenAI API
 }
 \description{
-See https://openai.com/api/pricing/ for information on different models.
+Perform a query against OpenAI's API.
+}
+\details{
+This function sends text content (either extracted from a PDF file or direct
+text input) to OpenAI's ChatGPT API along with a user-specified prompt. It
+handles file reading, API communication, and rate limiting.
+
+See \url{https://openai.com/api/pricing/} for information on different models.
+}
+\note{
+This function depends on functions \code{\link{ll_check_connection()}}
+   and \code{\link{ll_journal_corrections()}}.
+}
+\examples{
+\dontrun{
+# Query a PDF file
+result1 <- ll_query("research_paper.pdf", "Summarize the main findings")
+
+# Query direct text
+result2 <- ll_query(
+   "The explosion in genomic data has revolutionized biomedical science.",
+   "What is the topic?"
+)
+
+# Use a different model
+result3 <- ll_query("research_paper.pdf", "Extract key findings", model = "gpt-5-mini")
+}
+
+}
+\seealso{
+\url{https://openai.com/api/pricing/} for model pricing information
+
+\url{https://platform.openai.com/docs/models} for model selection
 }
