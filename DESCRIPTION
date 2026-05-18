@@ -11,7 +11,6 @@ Description: This package uses the OpenAI ChatGPT API to quickly mine informatio
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -25,3 +24,4 @@ Imports:
     tibble
 URL: http://www.avahoffman.com/litllm/
 Config/Needs/website: rmarkdown
+Config/roxygen2/version: 8.0.0
