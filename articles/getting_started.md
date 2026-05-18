@@ -1,0 +1,242 @@
+# Getting Started
+
+Load `litllm` and `tidyverse` (for some wrangling):
+
+``` r
+
+library(litllm)
+library(tidyverse)
+```
+
+## OpenAI API
+
+`litllm` uses the OpenAI API. You’ll need an API key and internet
+connection to use it.
+
+⚠️ *The OpenAI API costs money. It is very cheap (around \$0.60 for
+analyzing 100 pdfs), but you’ll need to add credits through their
+interface.*
+
+Check that you have an API key saved in your environment:
+
+``` r
+
+ll_check_api_key()
+```
+
+    #> Looks like you have a key stored!🎉
+    #> If you are having issues later, the key could be entered incorrectly or may no longer be active on OpenAI's API interface.
+
+If no API key detected, you’ll need to generate one via [OpenAI’s
+interface](https://openai.com/api) and add it to your R Environment. You
+can do this by entering `usethis::edit_r_environ()` and adding
+`OPENAI_API_KEY=XXX` (replace `XXX` with your key) to a new line.
+
+``` r
+
+usethis::edit_r_environ()
+```
+
+## Download Example File
+
+The first thing you’ll want to do is locate your pdf file(s). Let’s
+start with one file, then we’ll show you how to do multiple files.
+
+Download this file and ensure it’s in your working directory:
+
+``` r
+
+download.file(
+  url = "https://www.annualreviews.org/docserver/fulltext/genom/25/1/annurev-genom-021623-081639.pdf?expires=1731900753&id=id&accname=guest&checksum=AC39C6258EF7E19E7426CB44F2B37958",
+  destfile = "Taylor_etal.pdf"
+  )
+list.files(pattern = "pdf")
+```
+
+    #> [1]"Taylor_etal.pdf"
+
+## Mining Publication Metadata
+
+Let’s get basic information: title, year, and journal name. Each file
+will be a separate row.
+
+``` r
+
+journal_metadata <- ll_extract_journals("Taylor_etal.pdf")
+glimpse(journal_metadata)
+```
+
+    #> Rows: 1
+    #> Columns: 4
+    #> $ paper_id <chr> "Taylor_etal.pdf"
+    #> $ title    <chr> "Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References"
+    #> $ year     <chr> "2024"
+    #> $ journal  <chr> "Annual Review of Genomics and Human Genetics"
+
+➡ *This function supports caching, which hopefully saves you time and
+query costs! You can delete or relocate the cached file to rerun from
+scratch.*
+
+⚠️ *We recommend **checking your data regularly** for anything that
+doesn’t make sense. LLMs like ChatGPT can save time, but they definitely
+make mistakes. You don’t want to end up with a journal entitled “Johns
+Hopkins University”!*
+
+## Mining Authors and Institutions
+
+Let’s obtain the authors and their institutions. Each author will be on
+a separate row.
+
+``` r
+
+authors <- ll_extract_authors("Taylor_etal.pdf")
+glimpse(authors)
+```
+
+    #> Rows: 11
+    #> Columns: 3
+    #> $ paper_id <chr> "Taylor_etal.pdf", "Taylor_etal.pdf", "Taylor_etal.pdf", "Ta…
+    #> $ title    <chr> "Beyond the Human Genome Project: The Age of Complete Human …
+    #> $ auth     <chr> "Dylan J. Taylor, Department of Biology, Johns Hopkins Unive…
+
+``` r
+
+head(authors)
+```
+
+    #>          paper_id                                                                                                title
+    #> 1 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #> 2 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #> 3 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #> 4 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #> 5 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #> 6 Taylor_etal.pdf Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References
+    #>                                                                                                                         auth
+    #> 1                                 Dylan J. Taylor, Department of Biology, Johns Hopkins University, Baltimore, Maryland, USA
+    #> 2                               Jordan M. Eizenga, Genomics Institute, University of California, Santa Cruz, California, USA
+    #> 3                              Qiuhui Li, Department of Computer Science, Johns Hopkins University, Baltimore, Maryland, USA
+    #> 4                               Arun Das, Department of Computer Science, Johns Hopkins University, Baltimore, Maryland, USA
+    #> 5 Katharine M. Jenike, Department of Genetic Medicine, Johns Hopkins University School of Medicine, Baltimore, Maryland, USA
+    #> 6                  Eimear E. Kenny, Institute for Genomic Health, Icahn School of Medicine at Mount Sinai, New York, NY, USA
+
+You can view the data in raw format as well.
+
+``` r
+
+authors_raw <- ll_extract_authors("Taylor_etal.pdf", clean_authors = F)
+authors_raw
+```
+
+    #> $Taylor_etal.pdf
+    #> [1] "Title: Beyond the Human Genome Project: The Age of Complete Human Genome Sequences and Pangenome References\n\nAuthor(s):\nDylan J. 
+    #> Taylor, Department of Biology, Johns Hopkins University, Baltimore, Maryland, USA\nJordan M. Eizenga, Genomics Institute, University of 
+    #> California, Santa Cruz...
+
+➡ *This function supports caching, which hopefully saves you time and
+query costs! You can delete or relocate the cached file to rerun from
+scratch.*
+
+## Getting Institution Information
+
+We might be interested in information about the institutions. But first
+let’s limit it to unique institutions.
+
+``` r
+
+distinct_institutions <- unique(authors$inst)
+```
+
+    #> [1] "Johns Hopkins University"
+    #> [2] "University of California, Santa Cruz"
+    #> [3] "Johns Hopkins University School of Medicine"
+    #> [4] "Icahn School of Medicine at Mount Sinai"
+    #> [5] "Institut de Recherche en Santé Digestive, Université de Toulouse, INSERM, INRA, ENVT, UPS"
+
+Let’s see if these institutions have a large student body. Any
+institutional descriptor can be inserted for the `logical_check`
+argument.
+
+``` r
+
+is_large <-
+  ll_check_institution_type(
+    distinct_institutions,
+    logical_check = "an institution with >5000 students"
+    )
+is_large
+```
+
+    #> # A tibble: 5 × 2
+    #>   name                                          an_institution_with_…¹
+    #>   <chr>                                         <chr>
+    #> 1 Johns Hopkins University                      TRUE
+    #> 2 University of California, Santa Cruz          TRUE
+    #> 3 Johns Hopkins University School of Medicine   FALSE
+    #> 4 Icahn School of Medicine at Mount Sinai       FALSE
+    #> 5 Institut de Recherche en Santé Digestive, Un… FALSE
+    #> # ℹ abbreviated name: ¹​an_institution_with_5000_students
+
+Join to `authors` to build your dataset!
+
+``` r
+
+authors <- authors %>% left_join(is_large, by = c("inst" = "name"))
+```
+
+    #> Rows: 11
+    #> Columns: 5
+    #> $ paper_id                          <chr> "Taylor_etal.pdf", "Taylor_etal.pd…
+    #> $ title                             <chr> "Beyond the Human Genome Project: …
+    #> $ auth                              <chr> "Dylan J. Taylor, Department of Bi…
+    #> $ inst                              <chr> "Johns Hopkins University", "Unive…
+    #> $ an_institution_with_5000_students <chr> "TRUE", "TRUE", "TRUE", "TRUE", "F…
+
+## Multiple PDF Files
+
+The real power of automation can be felt when you have a lot of files.
+You can use these functions on a directory instead of a pdf file.
+
+``` r
+
+multi_journal_metadata <- ll_extract_journals("pdf/")
+```
+
+    #> Querying: pdf/Hung_etal.pdf
+    #> pdf/Hung_etal.pdf --- duration: 6
+    #> Querying: pdf/Taylor_etal.pdf
+    #> pdf/Taylor_etal.pdf --- duration: 6
+    #> File written to: /Users/me/litllm/journal_list.rds
+
+``` r
+
+glimpse(multi_journal_metadata)
+```
+
+    #> Rows: 2
+    #> Columns: 4
+    #> $ paper_id <chr> "pdf/Hung_etal.pdf", "pdf/Taylor_etal.pdf"
+    #> $ title    <chr> "Harmonizing and integrating the NCI Genomic Data Commons through accessible, interactive, and cloud-enabled workflows", "Beyond the Human …
+    #> $ year     <chr> "2025", "2024"
+    #> $ journal  <chr> "PLoS ONE", "Annual Review of Genomics and Human Genetics"
+
+``` r
+
+multi_authors <- ll_extract_authors("pdf/")
+```
+
+    #> Querying: pdf/Hung_etal.pdf
+    #> pdf/Hung_etal.pdf --- duration: 6.05043506622314
+    #> Querying: pdf/Taylor_etal.pdf
+    #> pdf/Taylor_etal.pdf --- duration: 7.92582488059998
+    #> File written to: /Users/me/litllm/author_list.rds
+
+``` r
+
+glimpse(multi_authors)
+```
+
+    #> Rows: 17
+    #> Columns: 3
+    #> $ paper_id <chr> "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf/Hung_etal.pdf", "pdf…
+    #> $ title    <chr> "Harmonizing and integrating the NCI Genomic Data Commons through accessible, interactiv…
+    #> $ auth     <chr> "Ling-Hong Hung, School of Engineering and Technology, University of Washington Tacoma, …
