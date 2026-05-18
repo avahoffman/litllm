@@ -8,3 +8,5 @@
 ^\.github$
 ^vignettes/articles$
 ^LICENSE\.md$
+^\.positai$
+^\.claude$

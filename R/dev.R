@@ -9,7 +9,7 @@ ll_setup <- function(load=FALSE) {
     # usethis::use_package("janitor", "Imports")
 
     # pkgdown build - just run once
-    usethis::use_pkgdown_github_pages()
+    # usethis::use_pkgdown_github_pages()
   }
 }
 

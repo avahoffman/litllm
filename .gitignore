@@ -6,3 +6,4 @@
 *.pdf
 docs
 pdf/*
+.positai
