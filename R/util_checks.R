@@ -1,5 +1,6 @@
 # These functions are meant to be shortcuts or are used by other functions.
 
+
 #' Check for the OpenAI API Key.
 #'
 #' @return A message.
