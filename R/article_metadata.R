@@ -106,7 +106,8 @@ ll_clean_journals <- function(x) {
 ll_extract_authors <- function(file_path,
                                model = "gpt-5.4-mini",
                                api_key = Sys.getenv("OPENAI_API_KEY"),
-                               clean_authors = TRUE) {
+                               clean_authors = TRUE,
+                               drop_nulls = FALSE) {
   # I looked into parallelizing this, but ran into rate limitation. So probably just best to let this run and be patient :)
 
   files <- ll_check_file_structure(file_path)
@@ -133,7 +134,7 @@ ll_extract_authors <- function(file_path,
       "/",
       cache_file
     )
-    load(cache_file) # Load as `author_list`
+    author_list <- base::readRDS(cache_file)
     if (length(author_list) == 1) {
       if (author_list == "author_list") {
         stop(
@@ -144,6 +145,9 @@ ll_extract_authors <- function(file_path,
   }
 
   # Optional cleaning of output
+  if (drop_nulls) {
+    author_list <- author_list[!sapply(author_list, is.null)]
+  }
   if (clean_authors) {
     authors_output <-
       dplyr::bind_rows(lapply(author_list, ll_clean_authors), .id = "paper_id")
@@ -194,7 +198,7 @@ ll_extract_journals <- function(file_path,
       "/",
       cache_file
     )
-    load(cache_file) # Load as `journal_list`
+    journal_list <- base::readRDS(cache_file)
     if (journal_list[1] == "journal_list") {
       stop(
         "There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_journal` again."
