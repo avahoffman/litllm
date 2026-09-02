@@ -133,7 +133,7 @@ ll_extract_authors <- function(file_path,
       "/",
       cache_file
     )
-    author_list <- readRDS(cache_file)
+    load(cache_file) # Load as `author_list`
     if (length(author_list) == 1) {
       if (author_list == "author_list") {
         stop(
@@ -194,7 +194,7 @@ ll_extract_journals <- function(file_path,
       "/",
       cache_file
     )
-    journal_list <- readRDS(cache_file)
+    load(cache_file) # Load as `journal_list`
     if (journal_list[1] == "journal_list") {
       stop(
         "There was a problem saving this file previously. Please delete the cached file and try running `ll_extract_journal` again."
